@@ -2,8 +2,11 @@ package entity;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,14 +28,17 @@ public class Recordatorio {
 
     @Column(name="mensaje")
     private String mensaje;
+
     @Column(name ="fecha_envio")
     private LocalDateTime fechaEnvio;
+
     @Column(name = "enviado")
     private boolean enviado;
 
     @Column(name ="cita")
-    @OneToOne
+    @OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "cita_id", referencedColumnName = "id")
+    @JsonBackReference
     private Cita cita;
 
     public void enviar() { }

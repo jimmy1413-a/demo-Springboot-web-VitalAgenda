@@ -4,9 +4,12 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -26,10 +29,12 @@ public class Paciente extends Usuario {
     @Column(name ="direccion")
     private String direccion;
 
-    @OneToMany(mappedBy = "paciente", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "pacientes", cascade = CascadeType.ALL,fetch=FetchType.LAZY)
+    @JsonManagedReference
     private List<Cita> citas;
 
-    @OneToMany(mappedBy = "paciente", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "pacientes", cascade = CascadeType.ALL,fetch=FetchType.LAZY)
+    @JsonManagedReference
     private List<HistorialClinico> historial;
 
     public void solicitarCita(Medico medico, LocalDate fecha, java.time.LocalTime hora, String motivo) {
