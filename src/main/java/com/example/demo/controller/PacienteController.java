@@ -1,4 +1,4 @@
-package controller;
+package com.example.demo.controller;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import entity.Cita;
-import entity.HistorialClinico;
-import entity.Paciente;
-import repository.PacienteRepository;
+import com.example.demo.entity.Cita;
+import com.example.demo.entity.HistorialClinico;
+import com.example.demo.entity.Paciente;
+import com.example.demo.repository.PacienteRepository;
 
 @RestController
 @RequestMapping("/api/pacientes")

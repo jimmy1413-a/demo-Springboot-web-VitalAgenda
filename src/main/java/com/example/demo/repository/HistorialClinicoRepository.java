@@ -1,4 +1,4 @@
-package repository;
+package com.example.demo.repository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -6,9 +6,9 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import entity.HistorialClinico;
-import entity.Medico;
-import entity.Paciente;
+import com.example.demo.entity.HistorialClinico;
+import com.example.demo.entity.Medico;
+import com.example.demo.entity.Paciente;
 
 @Repository
 public interface  HistorialClinicoRepository extends JpaRepository<HistorialClinico, Long> {

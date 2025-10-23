@@ -1,10 +1,13 @@
-package entity;
+// ...existing code...
+package com.example.demo.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -27,16 +30,16 @@ public class Medico extends Usuario {
     private String consultorio;
 
     // Un médico tiene muchos horarios
-    @OneToMany(mappedBy = "medico", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Horario> horarios;
+    @OneToMany(mappedBy = "medico", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Horario> horarios = new ArrayList<>();
 
     // Un médico tiene muchas citas
-    @OneToMany(mappedBy = "medico", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Cita> citas;
+    @OneToMany(mappedBy = "medico", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Cita> citas = new ArrayList<>();
 
     // Un médico tiene muchos historiales clínicos
-    @OneToMany(mappedBy = "medico", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<HistorialClinico> historiales;
+    @OneToMany(mappedBy = "medico", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<HistorialClinico> historiales = new ArrayList<>();
 
     // ==== MÉTODOS DE LÓGICA ====
 
@@ -47,7 +50,9 @@ public class Medico extends Usuario {
 
     public void eliminarHorario(Horario horario) {
         horarios.remove(horario);
-        horario.setMedico(null);
+        if (horario != null) {
+            horario.setMedico(null);
+        }
     }
 
     public void verCitasPendientes() {
@@ -67,3 +72,4 @@ public class Medico extends Usuario {
         */
     }
 }
+// ...existing code...

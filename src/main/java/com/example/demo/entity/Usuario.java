@@ -1,4 +1,4 @@
-package entity;
+package com.example.demo.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -7,47 +7,51 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "usuarios")
+@Inheritance(strategy = InheritanceType.JOINED)
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Getter
+@Setter
 public class Usuario {
     @Id
-    @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name ="nombre",nullable=false)
+    @Column(name = "nombre", nullable = false)
     private String nombre;
 
-    
-    @Column(unique = true,name ="email",nullable=false)
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 
-    @Column(name ="contraseña",unique=true,nullable=false)
-    private String contraseña;
+    // usar nombre de columna sin acentos y quitar unique en contraseña
+    @Column(name = "contrasena", nullable = false)
+    private String contrasena;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "rol")
+    @Column(name = "rol", nullable = false)
     private Roles rol;
 
     public boolean autenticar(String email, String contraseña) {
-        return this.email.equals(email) && this.contraseña.equals(contraseña);
+        return this.email.equals(email) && this.contrasena.equals(contraseña);
     }
 
     public void cambiarContraseña(String nuevaContraseña) {
-        this.contraseña = nuevaContraseña;
+        this.contrasena = nuevaContraseña;
     }
 
     public boolean tieneRol(Roles rol) {
         return this.rol == rol;
     }
 }
-
-

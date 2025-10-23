@@ -1,4 +1,4 @@
-package controller;
+package com.example.demo.controller;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import entity.HistorialClinico;
-import repository.HistorialClinicoRepository;
+import com.example.demo.entity.HistorialClinico;
+import com.example.demo.repository.HistorialClinicoRepository;
 
 @RestController
 @RequestMapping("/api/historiales")

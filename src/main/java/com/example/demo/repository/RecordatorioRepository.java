@@ -1,4 +1,4 @@
-package repository;
+package com.example.demo.repository;
 
 
 import java.time.LocalDateTime;
@@ -7,8 +7,8 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import entity.Cita;
-import entity.Recordatorio;
+import com.example.demo.entity.Cita;
+import com.example.demo.entity.Recordatorio;
 
 @Repository
 public interface RecordatorioRepository extends JpaRepository<Recordatorio, Long> {

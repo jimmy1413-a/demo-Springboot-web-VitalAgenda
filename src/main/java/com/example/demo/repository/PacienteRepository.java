@@ -1,4 +1,4 @@
-package repository;
+package com.example.demo.repository;
 
 
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import entity.Paciente;
+import com.example.demo.entity.Paciente;
 
 @Repository
 public interface PacienteRepository extends JpaRepository<Paciente, Long> {

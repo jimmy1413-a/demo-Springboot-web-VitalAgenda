@@ -1,4 +1,4 @@
-package entity;
+package com.example.demo.entity;
 
 import java.time.LocalDateTime;
 
@@ -35,7 +35,7 @@ public class Recordatorio {
     @Column(name = "enviado")
     private boolean enviado;
 
-    @Column(name ="cita")
+
     @OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "cita_id", referencedColumnName = "id")
     @JsonBackReference

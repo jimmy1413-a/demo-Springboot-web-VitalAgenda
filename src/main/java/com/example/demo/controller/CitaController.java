@@ -1,4 +1,4 @@
-package controller;
+package com.example.demo.controller;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import entity.Cita;
-import repository.CitaRepository;
+import com.example.demo.entity.Cita;
+import com.example.demo.repository.CitaRepository;
 
 @RestController
 @RequestMapping("/api/citas")

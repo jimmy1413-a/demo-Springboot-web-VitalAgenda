@@ -1,4 +1,4 @@
-package controller;
+package com.example.demo.controller;
 
 
 import java.util.List;
@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import entity.Recordatorio;
-import repository.RecordatorioRepository;
+import com.example.demo.entity.Recordatorio;
+import com.example.demo.repository.RecordatorioRepository;
 
 @RestController
 @RequestMapping("/api/recordatorios")
