@@ -1,44 +1,43 @@
 package entity;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.time.LocalTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "pacientes")
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 public class Paciente extends Usuario {
-    @Column(name ="fecha_nacimiento")
-    private Date fechaNacimiento;
-    @Column(name="telefono")
+
+    private LocalDate fechaNacimiento;
     private String telefono;
-    @Column(name ="direccion")
     private String direccion;
 
-    @OneToMany(mappedBy = "pacientes", cascade = CascadeType.ALL,fetch=FetchType.LAZY)
+    @OneToMany(mappedBy = "paciente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Cita> citas;
 
-    @OneToMany(mappedBy = "pacientes", cascade = CascadeType.ALL,fetch=FetchType.LAZY)
+    @OneToMany(mappedBy = "paciente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<HistorialClinico> historial;
 
-    public void solicitarCita(Medico medico, LocalDate fecha, java.time.LocalTime hora, String motivo) {
-        // lógica para crear cita
+    public void solicitarCita(Medico medico, LocalDate fecha, LocalTime hora, String motivo) {
+        // Aquí podrías implementar la creación de la cita
     }
 
     public List<Cita> verCitas() {
@@ -50,7 +49,8 @@ public class Paciente extends Usuario {
     }
 
     public void cancelarCita(Long citaId) {
-        // lógica para cancelar cita
+        if (citas != null) {
+            citas.removeIf(c -> c.getId().equals(citaId));
+        }
     }
 }
-

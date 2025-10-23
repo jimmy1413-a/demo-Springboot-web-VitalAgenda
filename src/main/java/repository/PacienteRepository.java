@@ -1,6 +1,8 @@
 package repository;
 
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,5 +10,13 @@ import entity.Paciente;
 
 @Repository
 public interface PacienteRepository extends JpaRepository<Paciente, Long> {
-    Paciente findByEmail(String email);
+    // Buscar pacientes por nombre (heredado de Usuario)
+    List<Paciente> findByNombreContainingIgnoreCase(String nombre);
+
+    // Buscar pacientes por teléfono
+    List<Paciente> findByTelefono(String telefono);
+
+    // Buscar pacientes por dirección
+    List<Paciente> findByDireccionContainingIgnoreCase(String direccion);
+
 }

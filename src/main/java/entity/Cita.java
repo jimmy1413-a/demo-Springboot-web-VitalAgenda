@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -16,53 +15,59 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "citas")
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 public class Cita {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "fecha")
     private LocalDate fecha;
-
-    @Column(name = "hora")
     private LocalTime hora;
 
-    @Column(name = "estado")
     @Enumerated(EnumType.STRING)
     private Estados estado;
 
-    @Column(name = "motivo")
     private String motivo;
 
-    @Column(name = "paciente")
     @ManyToOne
     @JoinColumn(name = "paciente_id", referencedColumnName = "id")
     private Paciente paciente;
 
-    @Column(name = "medico")
     @ManyToOne
     @JoinColumn(name = "medico_id", referencedColumnName = "id")
     private Medico medico;
 
-    @Column(name = "recordatorio")
-    @OneToOne(mappedBy = "Cita", cascade = CascadeType.ALL)
-    @JoinColumn(name = "recordatorio_id", referencedColumnName = "id")
+    @OneToOne(mappedBy = "cita", cascade = CascadeType.ALL)
     private Recordatorio recordatorio;
 
-    public void confirmar() { }
-    public void cancelar() { }
-    public boolean esEditable() { return false; }
-    public boolean esEnElFuturo() { return false; }
-    public boolean perteneceA(Paciente paciente) { return false; }
-    public boolean perteneceA(Medico medico) { return false; }
+    public void confirmar() { this.estado = Estados.CONFIRMADA; }
 
+    public void cancelar() { this.estado = Estados.CANCELADA; }
 
+    public boolean esEditable() {
+        return this.estado == Estados.PENDIENTE;
+    }
+
+    public boolean esEnElFuturo() {
+        return this.fecha.isAfter(LocalDate.now()) ||
+               (this.fecha.isEqual(LocalDate.now()) && this.hora.isAfter(LocalTime.now()));
+    }
+
+    public boolean perteneceA(Paciente paciente) {
+        return this.paciente != null && this.paciente.equals(paciente);
+    }
+
+    public boolean perteneceA(Medico medico) {
+        return this.medico != null && this.medico.equals(medico);
+    }
 }
