@@ -3,6 +3,8 @@ package com.example.demo.entity;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -41,10 +43,12 @@ public class Cita {
 
     @ManyToOne
     @JoinColumn(name = "paciente_id", referencedColumnName = "id")
+    @JsonBackReference
     private Paciente paciente;
 
     @ManyToOne
     @JoinColumn(name = "medico_id", referencedColumnName = "id")
+    @JsonBackReference("medico-citas")
     private Medico medico;
 
     @OneToOne(mappedBy = "cita", cascade = CascadeType.ALL)

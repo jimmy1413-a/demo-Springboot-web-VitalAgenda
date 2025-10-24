@@ -24,8 +24,11 @@ import lombok.Setter;
 @Setter
 public class Paciente extends Usuario {
 
+    
     private LocalDate fechaNacimiento;
+
     private String telefono;
+
     private String direccion;
 
     @OneToMany(mappedBy = "paciente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

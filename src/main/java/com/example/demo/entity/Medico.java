@@ -4,6 +4,8 @@ package com.example.demo.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,14 +33,17 @@ public class Medico extends Usuario {
 
     // Un médico tiene muchos horarios
     @OneToMany(mappedBy = "medico", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference("medico-horarios")
     private List<Horario> horarios = new ArrayList<>();
 
     // Un médico tiene muchas citas
     @OneToMany(mappedBy = "medico", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference("medico-citas")
     private List<Cita> citas = new ArrayList<>();
 
     // Un médico tiene muchos historiales clínicos
     @OneToMany(mappedBy = "medico", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference("medico-historiales")
     private List<HistorialClinico> historiales = new ArrayList<>();
 
     // ==== MÉTODOS DE LÓGICA ====

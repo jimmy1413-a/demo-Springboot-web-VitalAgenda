@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.entity.Cita;
 import com.example.demo.entity.HistorialClinico;
 import com.example.demo.entity.Paciente;
+import com.example.demo.entity.Roles;
 import com.example.demo.repository.PacienteRepository;
 
 @RestController
@@ -38,9 +39,11 @@ public class PacienteController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    public Paciente crearPaciente( @RequestBody Paciente paciente) {
-        return pacienteRepository.save(paciente);
+    @PostMapping(consumes = "application/json")
+    public ResponseEntity<Paciente> crearPaciente(@RequestBody Paciente paciente) {
+        paciente.setRol(Roles.PACIENTE); // Asegurar que el rol sea PACIENTE
+        Paciente nuevo = pacienteRepository.save(paciente);
+        return ResponseEntity.ok(nuevo);
     }
 
     @PutMapping("/{id}")
