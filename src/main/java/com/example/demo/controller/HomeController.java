@@ -20,7 +20,9 @@ import com.example.demo.repository.CitaRepository;
 import com.example.demo.repository.HistorialClinicoRepository;
 import com.example.demo.repository.MedicoRepository;
 import com.example.demo.repository.PacienteRepository;
+import com.example.demo.repository.RecordatorioRepository;
 import com.example.demo.repository.UsuarioRepository;
+import com.example.demo.service.NotificationService;
 
 @Controller
 public class HomeController {
@@ -39,6 +41,9 @@ public class HomeController {
 
     @Autowired
     private HistorialClinicoRepository historialRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("/")
     public String home(Authentication authentication) {
@@ -76,11 +81,15 @@ public class HomeController {
                 .sorted((h1, h2) -> h2.getFecha().compareTo(h1.getFecha()))
                 .collect(Collectors.toList());
 
+            // Obtener notificaciones del paciente
+            List<com.example.demo.entity.Recordatorio> notificaciones = notificationService.obtenerNotificacionesPendientes(paciente);
+
             model.addAttribute("paciente", paciente);
             model.addAttribute("citasPendientes", citasPendientes);
             model.addAttribute("citasConfirmadas", citasConfirmadas);
             model.addAttribute("totalCitas", citas.size());
             model.addAttribute("historialClinico", historialClinico);
+            model.addAttribute("notificaciones", notificaciones);
         }
 
         return "paciente/dashboard/dashboard";
@@ -169,6 +178,9 @@ public class HomeController {
                 .limit(3)
                 .collect(Collectors.toList());
 
+            // Obtener notificaciones del médico
+            List<com.example.demo.entity.Recordatorio> notificaciones = notificationService.obtenerNotificacionesPendientes(medico);
+
             model.addAttribute("medico", medico);
             model.addAttribute("todasLasCitas", todasLasCitas);
             model.addAttribute("citasHoy", citasHoy);
@@ -178,6 +190,7 @@ public class HomeController {
                 .map(c -> c.getPaciente())
                 .distinct()
                 .count());
+            model.addAttribute("notificaciones", notificaciones);
         }
 
         return "medico/dashboard/dashboard";

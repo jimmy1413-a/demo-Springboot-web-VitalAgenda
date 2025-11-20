@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.example.demo.entity.HistorialClinico;
@@ -17,9 +19,12 @@ import com.example.demo.repository.CitaRepository;
 import com.example.demo.repository.HistorialClinicoRepository;
 import com.example.demo.repository.MedicoRepository;
 import com.example.demo.repository.PacienteRepository;
+import com.example.demo.repository.RecordatorioRepository;
 import com.example.demo.repository.UsuarioRepository;
+import com.example.demo.service.NotificationService;
 
 @SpringBootApplication
+@EnableScheduling
 public class DemoApplication implements CommandLineRunner {
 
 	@Autowired
@@ -36,6 +41,12 @@ public class DemoApplication implements CommandLineRunner {
 
 	@Autowired
 	private HistorialClinicoRepository historialRepository;
+
+	@Autowired
+	private RecordatorioRepository recordatorioRepository;
+
+	@Autowired
+	private NotificationService notificationService;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -161,45 +172,16 @@ public class DemoApplication implements CommandLineRunner {
 			if (lauraUsuario != null) {
 				Medico laura = medicoRepository.findById(lauraUsuario.getId()).orElse(null);
 				if (laura != null) {
-					// Crear pacientes para Laura
-					Paciente paciente1 = new Paciente();
-					paciente1.setNombre("Carlos Rodríguez");
-					paciente1.setEmail("carlos.rodriguez@email.com");
-					paciente1.setContrasena(passwordEncoder.encode("paciente123"));
-					paciente1.setRol(Roles.PACIENTE);
-					paciente1.setFechaNacimiento(LocalDate.of(1985, 3, 20));
-					paciente1.setTelefono("555-0456");
-					paciente1.setDireccion("Avenida Central 456");
-					pacienteRepository.save(paciente1);
+					// Crear pacientes para Laura si no existen y sus historiales
+					crearHistorialParaPaciente(laura, "carlos.rodriguez@email.com", "Carlos Rodríguez",
+						LocalDate.of(1985, 3, 20), "555-0456", "Avenida Central 456",
+						"Hipertensión arterial", "Medicación antihipertensiva, dieta baja en sal",
+						"Paciente con buen control de la presión arterial", LocalDate.now().minusDays(30));
 
-					Paciente paciente2 = new Paciente();
-					paciente2.setNombre("Ana López");
-					paciente2.setEmail("ana.lopez@email.com");
-					paciente2.setContrasena(passwordEncoder.encode("paciente123"));
-					paciente2.setRol(Roles.PACIENTE);
-					paciente2.setFechaNacimiento(LocalDate.of(1992, 7, 15));
-					paciente2.setTelefono("555-0789");
-					paciente2.setDireccion("Plaza Mayor 789");
-					pacienteRepository.save(paciente2);
-
-					// Crear historial clínico para estos pacientes con Laura
-					HistorialClinico historial1 = new HistorialClinico();
-					historial1.setPaciente(paciente1);
-					historial1.setMedico(laura);
-					historial1.setDiagnostico("Hipertensión arterial");
-					historial1.setTratamiento("Medicación antihipertensiva, dieta baja en sal");
-					historial1.setNotas("Paciente con buen control de la presión arterial");
-					historial1.setFecha(LocalDate.now().minusDays(30));
-					historialRepository.save(historial1);
-
-					HistorialClinico historial2 = new HistorialClinico();
-					historial2.setPaciente(paciente2);
-					historial2.setMedico(laura);
-					historial2.setDiagnostico("Arritmia cardíaca");
-					historial2.setTratamiento("Medicación antiarrítmica, monitoreo continuo");
-					historial2.setNotas("Paciente requiere seguimiento mensual");
-					historial2.setFecha(LocalDate.now().minusDays(15));
-					historialRepository.save(historial2);
+					crearHistorialParaPaciente(laura, "ana.lopez@email.com", "Ana López",
+						LocalDate.of(1992, 7, 15), "555-0789", "Plaza Mayor 789",
+						"Arritmia cardíaca", "Medicación antiarrítmica, monitoreo continuo",
+						"Paciente requiere seguimiento mensual", LocalDate.now().minusDays(15));
 
 					// Crear historial para Juan Pérez (usando paciente existente de BD)
 					Usuario usuarioJuan = usuarioRepository.findByEmail("juan@example.com");
@@ -232,6 +214,72 @@ public class DemoApplication implements CommandLineRunner {
 			}
 		} catch (Exception e) {
 			System.out.println("⚠ Error creando datos de prueba: " + e.getMessage());
+		}
+	}
+
+	/**
+	 * Método auxiliar para crear un paciente y su historial médico si no existen
+	 */
+	private void crearHistorialParaPaciente(Medico medico, String email, String nombre,
+			LocalDate fechaNacimiento, String telefono, String direccion,
+			String diagnostico, String tratamiento, String notas, LocalDate fechaHistorial) {
+		try {
+			// Buscar o crear paciente
+			Usuario usuarioExistente = usuarioRepository.findByEmail(email);
+			final Long pacienteId;
+
+			if (usuarioExistente == null) {
+				Paciente nuevoPaciente = new Paciente();
+				nuevoPaciente.setNombre(nombre);
+				nuevoPaciente.setEmail(email);
+				nuevoPaciente.setContrasena(passwordEncoder.encode("paciente123"));
+				nuevoPaciente.setRol(Roles.PACIENTE);
+				nuevoPaciente.setFechaNacimiento(fechaNacimiento);
+				nuevoPaciente.setTelefono(telefono);
+				nuevoPaciente.setDireccion(direccion);
+				Paciente pacienteGuardado = pacienteRepository.save(nuevoPaciente);
+				pacienteId = pacienteGuardado.getId();
+			} else {
+				pacienteId = usuarioExistente.getId();
+			}
+
+			// Crear historial si no existe
+			final Long finalPacienteId = pacienteId;
+			boolean historialExiste = historialRepository.findAll().stream()
+				.anyMatch(h -> h.getPaciente() != null && h.getPaciente().getId().equals(finalPacienteId)
+					&& h.getMedico() != null && h.getMedico().getId().equals(medico.getId())
+					&& diagnostico.equals(h.getDiagnostico()));
+
+			if (!historialExiste) {
+				Paciente paciente = pacienteRepository.findById(pacienteId).orElse(null);
+				if (paciente != null) {
+					HistorialClinico historial = new HistorialClinico();
+					historial.setPaciente(paciente);
+					historial.setMedico(medico);
+					historial.setDiagnostico(diagnostico);
+					historial.setTratamiento(tratamiento);
+					historial.setNotas(notas);
+					historial.setFecha(fechaHistorial);
+					historialRepository.save(historial);
+				}
+			}
+		} catch (Exception e) {
+			System.out.println("⚠ Error creando historial para " + email + ": " + e.getMessage());
+		}
+	}
+
+	/**
+		* Tarea programada que se ejecuta todos los días a las 7:00 AM
+		* para crear notificaciones de citas del día
+		*/
+	@Scheduled(cron = "0 0 7 * * *") // Todos los días a las 7:00 AM
+	public void crearNotificacionesDiarias() {
+		try {
+			System.out.println("🔔 Creando notificaciones para citas de hoy...");
+			notificationService.crearNotificacionesParaHoy();
+			System.out.println("✅ Notificaciones creadas exitosamente");
+		} catch (Exception e) {
+			System.out.println("❌ Error creando notificaciones diarias: " + e.getMessage());
 		}
 	}
 }

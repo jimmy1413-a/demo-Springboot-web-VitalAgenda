@@ -84,12 +84,14 @@ public class PacienteController {
                     .collect(Collectors.toList());
 
                 model.addAttribute("pacientes", pacientesUnicos);
-                model.addAttribute("esMedico", true);
+                model.addAttribute("navFragment", "fragments/medico-nav.html");
+                model.addAttribute("isAdmin", false);
             }
         } else {
             // Para administradores, mostrar todos los pacientes
             model.addAttribute("pacientes", pacienteRepository.findAll());
-            model.addAttribute("esMedico", false);
+            model.addAttribute("navFragment", "fragments/admin-nav.html");
+            model.addAttribute("isAdmin", true);
         }
 
         return "paciente/paciente-list";
@@ -102,6 +104,7 @@ public class PacienteController {
             return "redirect:/pacientes";
         }
         model.addAttribute("paciente", new Paciente());
+        model.addAttribute("navFragment", "fragments/admin-nav.html");
         return "paciente/form";
     }
 

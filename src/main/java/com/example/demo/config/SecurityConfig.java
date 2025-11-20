@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,6 +20,7 @@ import com.example.demo.repository.UsuarioRepository;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -41,12 +43,16 @@ public class SecurityConfig {
                 .requestMatchers("/paciente/historial").hasRole("PACIENTE")
                 .requestMatchers("/medico/dashboard").hasRole("MEDICO")
                 .requestMatchers("/admin/dashboard").hasRole("ADMIN")
-                // Páginas de pacientes
+                // Páginas de pacientes (solo para pacientes)
                 .requestMatchers("/paciente/**").hasRole("PACIENTE")
-                // Páginas de médicos
+                // Páginas de médicos (solo para médicos)
                 .requestMatchers("/medico/**").hasRole("MEDICO")
-                // Páginas de admin
+                // Páginas de admin (solo para admins)
                 .requestMatchers("/admin/**").hasRole("ADMIN")
+                // Páginas de gestión (accesibles por admins)
+                .requestMatchers("/medicos/**", "/usuarios/**").hasRole("ADMIN")
+                // Pacientes y citas accesibles por médicos y admins
+                .requestMatchers("/pacientes/**", "/citas/**").hasAnyRole("MEDICO", "ADMIN")
                 // Todas las demás requieren autenticación
                 .anyRequest().authenticated()
             )

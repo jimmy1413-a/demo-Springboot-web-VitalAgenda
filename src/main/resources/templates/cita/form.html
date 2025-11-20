@@ -15,7 +15,7 @@
 </head>
 <body>
     <!-- Navigation -->
-    <div th:replace="fragments/medico-nav.html"></div>
+    <div th:replace="${navFragment}"></div>
 
     <!-- Main Content -->
     <div class="container-fluid py-4">
@@ -109,13 +109,27 @@
                                 </select>
                             </div>
 
-                            <div class="mb-3">
+                            <div class="mb-3" th:if="${isMedico == null or !isMedico}">
                                 <label for="medico" class="form-label">
                                     <i class="fas fa-user-md"></i> Médico *
                                 </label>
                                 <select class="form-control" id="medico" name="medicoId" required>
                                     <option value="">Seleccionar Médico</option>
                                 </select>
+                            </div>
+                            <div class="mb-3" th:if="${isMedico}">
+                                <label for="medico" class="form-label">
+                                    <i class="fas fa-user-md"></i> Médico
+                                </label>
+                                <input type="text"
+                                       class="form-control"
+                                       th:value="${cita?.medico?.nombre}"
+                                       readonly
+                                       style="background-color: #f8f9fa;">
+                                <input type="hidden" name="medicoId" th:value="${cita?.medico?.id}">
+                                <div class="form-text text-muted">
+                                    <i class="fas fa-info-circle"></i> Como médico, usted será asignado automáticamente a esta cita.
+                                </div>
                             </div>
 
                             <div class="mb-4">
@@ -170,7 +184,10 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Load pacientes and medicos for selects
             loadPacientes();
-            loadMedicos();
+            const isMedico = /*[[${isMedico}]]*/ false;
+            if (!isMedico) {
+                loadMedicos();
+            }
 
             // Form submission
             document.getElementById('citaForm').addEventListener('submit', function(e) {

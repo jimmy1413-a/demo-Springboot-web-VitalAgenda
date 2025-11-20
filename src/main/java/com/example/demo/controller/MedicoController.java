@@ -31,6 +31,7 @@ public class MedicoController {
     @GetMapping("")
     public String listarMedicosWeb(Model model) {
         model.addAttribute("medicos", medicoRepository.findAll());
+        model.addAttribute("esMedico", false); // Los administradores ven esta página
         return "medico/medico-list";
     }
 

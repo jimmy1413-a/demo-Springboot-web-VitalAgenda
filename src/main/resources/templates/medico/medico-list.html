@@ -13,45 +13,7 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary" aria-label="Main navigation">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="/">
-                <i class="fas fa-hospital"></i> Sistema Médico
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">
-                            <i class="fas fa-home"></i> Inicio
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/citas">
-                            <i class="fas fa-calendar"></i> Citas
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/medicos">
-                            <i class="fas fa-user-md"></i> Médicos
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/pacientes">
-                            <i class="fas fa-user-injured"></i> Pacientes
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/usuarios">
-                            <i class="fas fa-users"></i> Usuarios
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <div th:replace="fragments/admin-nav.html"></div>
 
     <!-- Main Content -->
     <div class="container-fluid py-4">
