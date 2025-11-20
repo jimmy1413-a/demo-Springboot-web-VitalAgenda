@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Citas - Sistema Médico</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary" aria-label="Main navigation">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/paciente/dashboard">
+                <i class="fas fa-hospital"></i> Sistema Médico
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/paciente/dashboard">
+                            <i class="fas fa-home"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/paciente/citas">
+                            <i class="fas fa-calendar"></i> Mis Citas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/paciente/historial">
+                            <i class="fas fa-file-medical"></i> Mi Historial Clínico
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <span class="navbar-text me-3">
+                            <i class="fas fa-user-injured"></i> <span th:text="${paciente.nombre}">Paciente</span>
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <form th:action="@{/logout}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-outline-light btn-sm">
+                                <i class="fas fa-sign-out-alt"></i> Salir
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/paciente/dashboard">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Mis Citas</li>
+            </ol>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-calendar text-primary"></i> Mis Citas Médicas
+                </h1>
+                <p class="text-muted mb-0">
+                    Gestiona todas tus citas médicas programadas
+                </p>
+            </div>
+            <div>
+                <a href="/paciente/dashboard" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver al Inicio
+                </a>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-calendar-check fa-3x text-success mb-3"></i>
+                        <h4 th:text="${totalCitas}">0</h4>
+                        <p class="text-muted mb-0">Total de Citas</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-clock fa-3x text-warning mb-3"></i>
+                        <h4 th:text="${citasPendientes.size()}">0</h4>
+                        <p class="text-muted mb-0">Citas Pendientes</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-check-circle fa-3x text-primary mb-3"></i>
+                        <h4 th:text="${citasConfirmadas.size()}">0</h4>
+                        <p class="text-muted mb-0">Citas Confirmadas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointments List -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list"></i> Historial Completo de Citas
+                </h5>
+            </div>
+            <div class="card-body">
+                <div th:if="${!citas.isEmpty()}" class="row">
+                    <div th:each="cita : ${citas}" class="col-md-6 mb-4">
+                        <div class="card border-primary">
+                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>
+                                        <i class="fas fa-calendar-day"></i>
+                                        <span th:text="${#temporals.format(cita.fecha, 'dd/MM/yyyy')}">Fecha</span>
+                                    </strong>
+                                    <span class="badge ms-2"
+                                          th:class="${cita.estado != null && cita.estado.name() == 'CONFIRMADA'} ? 'bg-success' : 'bg-warning'"
+                                          th:text="${cita.estado != null ? cita.estado.name() : 'SIN ESTADO'}">Estado</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="mb-3">
+                                            <h6 class="text-primary">
+                                                <i class="fas fa-clock"></i> Hora
+                                            </h6>
+                                            <p class="mb-0" th:text="${cita.hora}">Hora</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-3">
+                                            <h6 class="text-success">
+                                                <i class="fas fa-user-md"></i> Médico
+                                            </h6>
+                                            <p class="mb-0" th:text="${cita.medico.nombre}">Dr. Médico</p>
+                                            <small class="text-muted" th:text="${cita.medico.especialidad}">Especialidad</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <h6 class="text-info">
+                                        <i class="fas fa-sticky-note"></i> Motivo de la Cita
+                                    </h6>
+                                    <p class="mb-0" th:text="${cita.motivo}">Motivo de la consulta</p>
+                                </div>
+
+                                <!-- Recordatorios section removed - not available in Cita entity -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${citas.isEmpty()}" class="text-center py-5">
+                    <i class="fas fa-calendar-times fa-4x text-muted mb-4"></i>
+                    <h4 class="text-muted">No tienes citas programadas</h4>
+                    <p class="text-muted mb-4">Cuando programes una cita médica, aparecerá aquí</p>
+                    <a href="/paciente/dashboard" class="btn btn-primary">
+                        <i class="fas fa-home"></i> Volver al Inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-light text-center text-muted py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">
+                <i class="fas fa-hospital"></i> Sistema Médico - Gestión de Citas
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

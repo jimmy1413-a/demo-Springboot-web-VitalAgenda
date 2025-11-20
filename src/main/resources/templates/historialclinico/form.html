@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${historial?.id} ? 'Editar Historial Clínico - ' + ${paciente.nombre} : 'Nuevo Historial Clínico - ' + ${paciente.nombre}">
+        Historial Clínico Form
+    </title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <div th:replace="fragments/medico-nav.html"></div>
+
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/medico/dashboard">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="/historiales">Historiales</a></li>
+                <li class="breadcrumb-item"><a th:href="@{'/historiales/paciente/' + ${paciente.id}}" th:text="${paciente.nombre}">Paciente</a></li>
+                <li class="breadcrumb-item active" aria-current="page"
+                    th:text="${historial?.id} ? 'Editar Registro' : 'Nuevo Registro'">Formulario</li>
+            </ol>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-0">
+                    <i th:class="${historial?.id} ? 'fas fa-edit text-warning' : 'fas fa-plus text-success'"></i>
+                    <span th:text="${historial?.id} ? 'Editar Registro Médico' : 'Nuevo Registro Médico'">Registro Médico</span>
+                </h1>
+                <p class="text-muted mb-0">
+                    <strong>Paciente:</strong> <span th:text="${paciente.nombre}">Nombre del Paciente</span>
+                    (<span th:text="${paciente.email}">email@ejemplo.com</span>)
+                </p>
+            </div>
+            <div>
+                <a th:href="@{'/historiales/paciente/' + ${paciente.id}}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver al Historial
+                </a>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Main Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-file-medical"></i> Información del Registro Médico
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="historialForm" th:action="${historial != null and historial.id != null} ? '/historiales/' + ${historial.id} : '/historiales'"
+                              th:method="${historial != null and historial.id != null} ? 'PUT' : 'POST'">
+
+                            <!-- Hidden fields for relationships -->
+                            <input type="hidden" name="pacienteId" th:value="${paciente.id}">
+                            <input type="hidden" name="medicoId" th:value="${medico.id}">
+
+                            <!-- Date -->
+                            <div class="mb-3">
+                                <label for="fecha" class="form-label">
+                                    <i class="fas fa-calendar-day"></i> Fecha de Consulta *
+                                </label>
+                                <input type="date"
+                                       class="form-control"
+                                       id="fecha"
+                                       name="fecha"
+                                       th:value="${historial?.fecha != null} ? ${#temporals.format(historial.fecha, 'yyyy-MM-dd')} : ${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
+                                       required>
+                                <div class="form-text">
+                                    Fecha en que se realizó la consulta médica
+                                </div>
+                            </div>
+
+                            <!-- Diagnosis -->
+                            <div class="mb-3">
+                                <label for="diagnostico" class="form-label">
+                                    <i class="fas fa-stethoscope"></i> Diagnóstico *
+                                </label>
+                                <textarea class="form-control"
+                                          id="diagnostico"
+                                          name="diagnostico"
+                                          rows="3"
+                                          required
+                                          placeholder="Describa el diagnóstico médico..."
+                                          th:text="${historial?.diagnostico}"></textarea>
+                                <div class="form-text">
+                                    Diagnóstico médico detallado del paciente
+                                </div>
+                            </div>
+
+                            <!-- Treatment -->
+                            <div class="mb-3">
+                                <label for="tratamiento" class="form-label">
+                                    <i class="fas fa-pills"></i> Tratamiento *
+                                </label>
+                                <textarea class="form-control"
+                                          id="tratamiento"
+                                          name="tratamiento"
+                                          rows="3"
+                                          required
+                                          placeholder="Describa el tratamiento prescrito..."
+                                          th:text="${historial?.tratamiento}"></textarea>
+                                <div class="form-text">
+                                    Tratamiento médico prescrito al paciente
+                                </div>
+                            </div>
+
+                            <!-- Notes -->
+                            <div class="mb-4">
+                                <label for="notas" class="form-label">
+                                    <i class="fas fa-sticky-note"></i> Notas Adicionales
+                                </label>
+                                <textarea class="form-control"
+                                          id="notas"
+                                          name="notas"
+                                          rows="4"
+                                          placeholder="Observaciones adicionales, evolución del paciente, etc..."
+                                          th:text="${historial?.notas}"></textarea>
+                                <div class="form-text">
+                                    Información adicional relevante para el seguimiento del paciente
+                                </div>
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="d-flex gap-2 justify-content-center">
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i th:class="${historial?.id} ? 'fas fa-save' : 'fas fa-plus'"></i>
+                                    <span th:text="${historial?.id} ? 'Actualizar Registro' : 'Guardar Registro'">Guardar</span>
+                                </button>
+                                <button type="reset" class="btn btn-outline-secondary">
+                                    <i class="fas fa-undo"></i> Restablecer
+                                </button>
+                                <a th:href="@{'/historiales/paciente/' + ${paciente.id}}" class="btn btn-outline-danger">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Patient Info Card -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-user-injured"></i> Información del Paciente
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Nombre:</strong> <span th:text="${paciente.nombre}">Nombre</span></p>
+                                <p><strong>Email:</strong> <span th:text="${paciente.email}">email@ejemplo.com</span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Fecha de Nacimiento:</strong>
+                                    <span th:text="${paciente.fechaNacimiento != null} ? ${#temporals.format(paciente.fechaNacimiento, 'dd/MM/yyyy')} : 'No especificada'">
+                                        Fecha
+                                    </span>
+                                </p>
+                                <p><strong>Teléfono:</strong> <span th:text="${paciente.telefono}">Teléfono</span></p>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <strong>Dirección:</strong>
+                            <p th:text="${paciente.direccion}">Dirección del paciente</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-light text-center text-muted py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">
+                <i class="fas fa-hospital"></i> Sistema Médico - Gestión de Historial Clínico
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Form submission
+            document.getElementById('historialForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                const historialData = {
+                    fecha: formData.get('fecha'),
+                    diagnostico: formData.get('diagnostico'),
+                    tratamiento: formData.get('tratamiento'),
+                    notas: formData.get('notas'),
+                    paciente: { id: parseInt(formData.get('pacienteId')) },
+                    medico: { id: parseInt(formData.get('medicoId')) }
+                };
+
+                const isEdit = /*[[${historial?.id}]]*/ false;
+                const url = isEdit ? '/historiales/' + /*[[${historial?.id}]]*/ 0 : '/historiales';
+                const method = isEdit ? 'PUT' : 'POST';
+
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(historialData)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Network response was not ok');
+                })
+                .then(data => {
+                    showAlert('success', `Registro médico ${isEdit ? 'actualizado' : 'creado'} exitosamente!`);
+                    setTimeout(() => {
+                        globalThis.location.href = `/historiales/paciente/${formData.get('pacienteId')}`;
+                    }, 1500);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('danger', `Error ${isEdit ? 'actualizando' : 'creando'} el registro médico. Por favor, inténtelo de nuevo.`);
+                });
+            });
+        });
+
+        function showAlert(type, message) {
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+
+            // Remove existing alerts
+            document.querySelectorAll('.alert').forEach(alert => alert.remove());
+
+            // Add new alert at the top of the form
+            const form = document.getElementById('historialForm');
+            form.insertAdjacentHTML('afterbegin', alertHtml);
+
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                const alert = document.querySelector('.alert');
+                if (alert) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

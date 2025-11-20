@@ -1,60 +1,147 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${cita != null} ? 'Editar Cita' : 'Nueva Cita'">Cita</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Detalle de Cita - ' + ${cita.motivo}">Detalle de Cita</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 th:text="${cita != null} ? 'Editar Cita' : 'Nueva Cita'">Cita</h1>
+    <!-- Navigation -->
+    <div th:replace="fragments/medico-nav.html"></div>
 
-        <form th:action="${cita != null} ? @{/citas/{id}(id=${cita.id})} : @{/citas}" method="post">
-            <div class="mb-3">
-                <label for="fecha" class="form-label">Fecha</label>
-                <input type="date" class="form-control" id="fecha" name="fecha" th:value="${cita != null} ? ${#temporals.format(cita.fecha, 'yyyy-MM-dd')}" required>
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="/citas">Citas</a></li>
+                <li class="breadcrumb-item active" aria-current="page" th:text="${cita.motivo}">Cita</li>
+            </ol>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-calendar"></i> Detalle de Cita
+                </h1>
+                <p class="text-muted mb-0" th:text="${cita.motivo}">
+                    Información detallada de la cita
+                </p>
+            </div>
+            <div>
+                <a th:href="@{'/citas/' + ${cita.id} + '/edit'}" class="btn btn-warning me-2">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+                <a href="/citas" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver a la Lista
+                </a>
+            </div>
+        </div>
+
+        <!-- Cita Details -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-calendar"></i> Información de la Cita
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Fecha:</label>
+                                <p th:text="${cita.fecha}"></p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Hora:</label>
+                                <p th:text="${cita.hora}"></p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Estado:</label>
+                            <p>
+                                <span th:class="${cita.estado != null and cita.estado.name() == 'PENDIENTE'} ? 'badge bg-warning' :
+                                               (${cita.estado != null and cita.estado.name() == 'CONFIRMADA'} ? 'badge bg-success' : 'badge bg-danger')"
+                                      th:text="${cita.estado != null ? cita.estado.name() : 'Sin estado'}"></span>
+                            </p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Motivo:</label>
+                            <p th:text="${cita.motivo}"></p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label for="hora" class="form-label">Hora</label>
-                <input type="time" class="form-control" id="hora" name="hora" th:value="${cita != null} ? ${#temporals.format(cita.hora, 'HH:mm')}" required>
-            </div>
+            <div class="col-lg-4">
+                <!-- Paciente Info -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-user-injured"></i> Paciente
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${cita.paciente != null}">
+                            <h6 th:text="${cita.paciente.nombre}"></h6>
+                            <p class="mb-1"><strong>Email:</strong> <span th:text="${cita.paciente.email}"></span></p>
+                            <p class="mb-1"><strong>Teléfono:</strong> <span th:text="${cita.paciente.telefono}"></span></p>
+                            <a th:href="@{'/pacientes/' + ${cita.paciente.id}}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i> Ver Paciente
+                            </a>
+                        </div>
+                        <div th:if="${cita.paciente == null}">
+                            <p class="text-muted">Paciente no asignado</p>
+                        </div>
+                    </div>
+                </div>
 
-            <div class="mb-3">
-                <label for="estado" class="form-label">Estado</label>
-                <select class="form-control" id="estado" name="estado" required>
-                    <option value="PENDIENTE" th:selected="${cita != null and cita.estado.name() == 'PENDIENTE'}">Pendiente</option>
-                    <option value="CONFIRMADA" th:selected="${cita != null and cita.estado.name() == 'CONFIRMADA'}">Confirmada</option>
-                    <option value="CANCELADA" th:selected="${cita != null and cita.estado.name() == 'CANCELADA'}">Cancelada</option>
-                </select>
+                <!-- Medico Info -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-user-md"></i> Médico
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${cita.medico != null}">
+                            <h6 th:text="${cita.medico.nombre}"></h6>
+                            <p class="mb-1"><strong>Especialidad:</strong> <span th:text="${cita.medico.especialidad}"></span></p>
+                            <p class="mb-1"><strong>Consultorio:</strong> <span th:text="${cita.medico.consultorio}"></span></p>
+                            <a th:href="@{'/medicos/' + ${cita.medico.id}}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i> Ver Médico
+                            </a>
+                        </div>
+                        <div th:if="${cita.medico == null}">
+                            <p class="text-muted">Médico no asignado</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <div class="mb-3">
-                <label for="motivo" class="form-label">Motivo</label>
-                <textarea class="form-control" id="motivo" name="motivo" rows="3" th:text="${cita != null} ? ${cita.motivo}"></textarea>
-            </div>
-
-            <div class="mb-3">
-                <label for="paciente" class="form-label">Paciente</label>
-                <select class="form-control" id="paciente" name="pacienteId" required>
-                    <option value="">Seleccionar Paciente</option>
-                    <option th:each="paciente : ${pacientes}" th:value="${paciente.id}" th:text="${paciente.nombre}" th:selected="${cita != null and cita.paciente.id == paciente.id}"></option>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label for="medico" class="form-label">Médico</label>
-                <select class="form-control" id="medico" name="medicoId" required>
-                    <option value="">Seleccionar Médico</option>
-                    <option th:each="medico : ${medicos}" th:value="${medico.id}" th:text="${medico.nombre}" th:selected="${cita != null and cita.medico.id == medico.id}"></option>
-                </select>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Guardar</button>
-            <a href="/citas" class="btn btn-secondary">Cancelar</a>
-        </form>
+        </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Footer -->
+    <footer class="bg-light text-center text-muted py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">
+                <i class="fas fa-hospital"></i> Sistema Médico - Gestión de Citas
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

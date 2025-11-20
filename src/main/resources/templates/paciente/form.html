@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${paciente?.id} ? 'Editar Paciente - ' + ${paciente.nombre} : 'Nuevo Paciente'">
+        Paciente Form
+    </title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <div th:replace="fragments/medico-nav.html"></div>
+
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="/pacientes">Pacientes</a></li>
+                <li class="breadcrumb-item" th:if="${paciente?.id}">
+                    <a th:href="@{'/pacientes/' + ${paciente.id}}" th:text="${paciente.nombre}">Paciente</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page"
+                    th:text="${paciente?.id} ? 'Editar' : 'Nuevo Paciente'">Formulario</li>
+            </ol>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-0">
+                    <i th:class="${paciente?.id} ? 'fas fa-edit text-warning' : 'fas fa-plus text-success'"></i>
+                    <span th:text="${paciente?.id} ? 'Editar Paciente' : 'Nuevo Paciente'">Formulario de Paciente</span>
+                </h1>
+                <p class="text-muted mb-0"
+                   th:text="${paciente?.id} ? 'Actualizar información del paciente' : 'Agregar un nuevo paciente al sistema'">
+                   Formulario de paciente
+                </p>
+            </div>
+            <div>
+                <a href="/pacientes" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver a la Lista
+                </a>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Main Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-user-injured"></i> Información del Paciente
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="pacienteForm" action="/pacientes/api" method="post">
+
+                            <!-- Usuario Information -->
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="nombre" class="form-label">
+                                        <i class="fas fa-user"></i> Nombre *
+                                    </label>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="nombre"
+                                           name="nombre"
+                                           th:value="${paciente?.nombre}"
+                                           required
+                                           placeholder="Ingrese el nombre">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label">
+                                        <i class="fas fa-envelope"></i> Email *
+                                    </label>
+                                    <input type="email"
+                                           class="form-control"
+                                           id="email"
+                                           name="email"
+                                           th:value="${paciente?.email}"
+                                           required
+                                           placeholder="Ingrese el email">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="contrasena" class="form-label">
+                                        <i class="fas fa-lock"></i> Contraseña *
+                                    </label>
+                                    <input type="password"
+                                           class="form-control"
+                                           id="contrasena"
+                                           name="contrasena"
+                                           th:value="${paciente?.contrasena}"
+                                           required
+                                           placeholder="Ingrese la contraseña">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="rol" class="form-label">
+                                        <i class="fas fa-user-tag"></i> Rol
+                                    </label>
+                                    <select class="form-control" id="rol" name="rol">
+                                        <option value="PACIENTE" th:selected="${paciente?.rol?.name()} == 'PACIENTE' or ${paciente?.id} == null">Paciente</option>
+                                        <option value="MEDICO" th:selected="${paciente?.rol?.name()} == 'MEDICO'">Médico</option>
+                                        <option value="ADMIN" th:selected="${paciente?.rol?.name()} == 'ADMIN'">Admin</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Paciente Information -->
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="fechaNacimiento" class="form-label">
+                                        <i class="fas fa-birthday-cake"></i> Fecha de Nacimiento *
+                                    </label>
+                                    <input type="date"
+                                           class="form-control"
+                                           id="fechaNacimiento"
+                                           name="fechaNacimiento"
+                                           th:value="${paciente?.fechaNacimiento}"
+                                           required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="telefono" class="form-label">
+                                        <i class="fas fa-phone"></i> Teléfono *
+                                    </label>
+                                    <input type="tel"
+                                           class="form-control"
+                                           id="telefono"
+                                           name="telefono"
+                                           th:value="${paciente?.telefono}"
+                                           required
+                                           placeholder="Ingrese el teléfono">
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="direccion" class="form-label">
+                                    <i class="fas fa-map-marker-alt"></i> Dirección *
+                                </label>
+                                <textarea class="form-control"
+                                          id="direccion"
+                                          name="direccion"
+                                          rows="3"
+                                          required
+                                          placeholder="Ingrese la dirección"
+                                          th:text="${paciente?.direccion}"></textarea>
+                                <div class="form-text">
+                                    Proporcione la dirección completa del paciente.
+                                </div>
+                            </div>
+
+                            <!-- Current Citas (if editing) -->
+                            <div th:if="${paciente != null and paciente.id != null and paciente.citas != null and !paciente.citas.empty}"
+                                 class="mb-4">
+                                <label class="form-label">
+                                    <i class="fas fa-calendar"></i> Citas Actuales
+                                    <small class="text-muted">(One-to-Many Relationship)</small>
+                                </label>
+                                <div class="border rounded p-3 bg-light">
+                                    <div class="row">
+                                        <div th:each="cita : ${paciente.citas}" class="col-md-6 mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-calendar-day text-primary me-2"></i>
+                                                <div class="flex-grow-1">
+                                                    <span th:text="${cita.fecha + ' ' + cita.hora}">Fecha y Hora</span>
+                                                    <small class="text-muted d-block" th:text="${cita.motivo}">Motivo</small>
+                                                </div>
+                                                <a th:href="@{'/citas/' + ${cita.id}}"
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-center mt-2">
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle"></i>
+                                            Estas son las citas del paciente.
+                                            Para modificarlas, edite las citas individuales.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="d-flex gap-2 justify-content-center">
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i th:class="${paciente?.id} ? 'fas fa-save' : 'fas fa-plus'"></i>
+                                    <span th:text="${paciente?.id} ? 'Actualizar Paciente' : 'Crear Paciente'">Enviar</span>
+                                </button>
+                                <button type="reset" class="btn btn-outline-secondary">
+                                    <i class="fas fa-undo"></i> Restablecer
+                                </button>
+                                <a href="/pacientes" class="btn btn-outline-danger">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Help Information -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-info-circle"></i> Información de Relaciones One-to-Many
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-lightbulb text-warning"></i> Cómo funciona:</h6>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <i class="fas fa-check text-success"></i>
+                                        <strong>Un Paciente</strong> puede tener muchas citas
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-check text-success"></i>
+                                        <strong>Un Paciente</strong> puede tener muchos historiales clínicos
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-check text-success"></i>
+                                        Paciente es el <strong>"One"</strong> lado de la relación
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-code text-primary"></i> Estructura de Base de Datos:</h6>
+                                <div class="bg-light p-3 rounded">
+                                    <code>
+                                        @OneToMany(mappedBy = "paciente")<br>
+                                        private List<Cita> citas;
+                                    </code>
+                                </div>
+                                <small class="text-muted mt-2 d-block">
+                                    La clave foránea está en la tabla Cita (paciente_id)
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-light text-center text-muted py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">
+                <i class="fas fa-hospital"></i> Sistema Médico - Gestión de Pacientes
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Form submission
+            document.getElementById('pacienteForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                const pacienteData = {
+                    nombre: formData.get('nombre'),
+                    email: formData.get('email'),
+                    contrasena: formData.get('contrasena'),
+                    rol: formData.get('rol'),
+                    fechaNacimiento: formData.get('fechaNacimiento'),
+                    telefono: formData.get('telefono'),
+                    direccion: formData.get('direccion')
+                };
+
+                const isEdit = /*[[${paciente?.id}]]*/ false;
+                const url = isEdit ? `/api/pacientes/[[${paciente?.id}]]` : '/api/pacientes';
+                const method = isEdit ? 'PUT' : 'POST';
+
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(pacienteData)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Network response was not ok');
+                })
+                .then(data => {
+                    showAlert('success', `Paciente ${isEdit ? 'actualizado' : 'creado'} exitosamente!`);
+                    setTimeout(() => {
+                        globalThis.location.href = `/pacientes/${data.id}`;
+                    }, 1500);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('danger', `Error ${isEdit ? 'actualizando' : 'creando'} el paciente. Por favor, inténtelo de nuevo.`);
+                });
+            });
+        });
+
+        function showAlert(type, message) {
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+
+            // Remove existing alerts
+            document.querySelectorAll('.alert').forEach(alert => alert.remove());
+
+            // Add new alert at the top of the form
+            const form = document.getElementById('pacienteForm');
+            form.insertAdjacentHTML('afterbegin', alertHtml);
+
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                const alert = document.querySelector('.alert');
+                if (alert) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

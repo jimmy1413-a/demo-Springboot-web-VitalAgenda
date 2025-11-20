@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${cita?.id} ? 'Editar Cita - ' + ${cita.motivo} : 'Nueva Cita'">
+        Cita Form
+    </title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <div th:replace="fragments/medico-nav.html"></div>
+
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="/citas">Citas</a></li>
+                <li class="breadcrumb-item" th:if="${cita?.id}">
+                    <a th:href="@{'/citas/' + ${cita.id}}" th:text="${cita.motivo}">Cita</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page"
+                    th:text="${cita?.id} ? 'Editar' : 'Nueva Cita'">Formulario</li>
+            </ol>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-0">
+                    <i th:class="${cita?.id} ? 'fas fa-edit text-warning' : 'fas fa-plus text-success'"></i>
+                    <span th:text="${cita?.id} ? 'Editar Cita' : 'Nueva Cita'">Formulario de Cita</span>
+                </h1>
+                <p class="text-muted mb-0"
+                   th:text="${cita?.id} ? 'Actualizar información de la cita' : 'Agregar una nueva cita al sistema'">
+                   Formulario de cita
+                </p>
+            </div>
+            <div>
+                <a href="/citas" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver a la Lista
+                </a>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Main Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-calendar"></i> Información de la Cita
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="citaForm" action="/citas/api" method="post">
+
+                            <!-- Cita Information -->
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="fecha" class="form-label">
+                                        <i class="fas fa-calendar"></i> Fecha *
+                                    </label>
+                                    <input type="date"
+                                           class="form-control"
+                                           id="fecha"
+                                           name="fecha"
+                                           th:value="${cita?.fecha}"
+                                           required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="hora" class="form-label">
+                                        <i class="fas fa-clock"></i> Hora *
+                                    </label>
+                                    <input type="time"
+                                           class="form-control"
+                                           id="hora"
+                                           name="hora"
+                                           th:value="${cita?.hora}"
+                                           required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="estado" class="form-label">
+                                    <i class="fas fa-info-circle"></i> Estado *
+                                </label>
+                                <select class="form-control" id="estado" name="estado" required>
+                                    <option value="PENDIENTE" th:selected="${cita?.estado?.name()} == 'PENDIENTE'">Pendiente</option>
+                                    <option value="CONFIRMADA" th:selected="${cita?.estado?.name()} == 'CONFIRMADA'">Confirmada</option>
+                                    <option value="CANCELADA" th:selected="${cita?.estado?.name()} == 'CANCELADA'">Cancelada</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="paciente" class="form-label">
+                                    <i class="fas fa-user-injured"></i> Paciente *
+                                </label>
+                                <select class="form-control" id="paciente" name="pacienteId" required>
+                                    <option value="">Seleccionar Paciente</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="medico" class="form-label">
+                                    <i class="fas fa-user-md"></i> Médico *
+                                </label>
+                                <select class="form-control" id="medico" name="medicoId" required>
+                                    <option value="">Seleccionar Médico</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="motivo" class="form-label">
+                                    <i class="fas fa-align-left"></i> Motivo *
+                                </label>
+                                <textarea class="form-control"
+                                          id="motivo"
+                                          name="motivo"
+                                          rows="4"
+                                          required
+                                          placeholder="Ingrese el motivo de la cita"
+                                          th:text="${cita?.motivo}"></textarea>
+                                <div class="form-text">
+                                    Proporcione una descripción detallada del motivo de la cita.
+                                </div>
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="d-flex gap-2 justify-content-center">
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i th:class="${cita?.id} ? 'fas fa-save' : 'fas fa-plus'"></i>
+                                    <span th:text="${cita?.id} ? 'Actualizar Cita' : 'Crear Cita'">Enviar</span>
+                                </button>
+                                <button type="reset" class="btn btn-outline-secondary">
+                                    <i class="fas fa-undo"></i> Restablecer
+                                </button>
+                                <a href="/citas" class="btn btn-outline-danger">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-light text-center text-muted py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">
+                <i class="fas fa-hospital"></i> Sistema Médico - Gestión de Citas
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load pacientes and medicos for selects
+            loadPacientes();
+            loadMedicos();
+
+            // Form submission
+            document.getElementById('citaForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                const citaData = {
+                    fecha: formData.get('fecha'),
+                    hora: formData.get('hora'),
+                    estado: formData.get('estado'),
+                    motivo: formData.get('motivo'),
+                    paciente: { id: parseInt(formData.get('pacienteId')) },
+                    medico: { id: parseInt(formData.get('medicoId')) }
+                };
+
+                const isEdit = /*[[${cita?.id}]]*/ false;
+                const url = isEdit ? `/citas/api/[[${cita?.id}]]` : '/citas/api';
+                const method = isEdit ? 'PUT' : 'POST';
+
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(citaData)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Network response was not ok');
+                })
+                .then(data => {
+                    showAlert('success', `Cita ${isEdit ? 'actualizada' : 'creada'} exitosamente!`);
+                    setTimeout(() => {
+                        globalThis.location.href = `/citas/${data.id}`;
+                    }, 1500);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('danger', `Error ${isEdit ? 'actualizando' : 'creando'} la cita. Por favor, inténtelo de nuevo.`);
+                });
+            });
+        });
+
+        function loadPacientes() {
+            fetch('/pacientes/api')
+                .then(response => response.json())
+                .then(pacientes => {
+                    const select = document.getElementById('paciente');
+                    pacientes.forEach(paciente => {
+                        const option = document.createElement('option');
+                        option.value = paciente.id;
+                        option.textContent = paciente.nombre;
+                        if (/*[[${cita?.paciente?.id}]]*/ 0 == paciente.id) {
+                            option.selected = true;
+                        }
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error loading pacientes:', error));
+        }
+
+        function loadMedicos() {
+            fetch('/medicos/api')
+                .then(response => response.json())
+                .then(medicos => {
+                    const select = document.getElementById('medico');
+                    medicos.forEach(medico => {
+                        const option = document.createElement('option');
+                        option.value = medico.id;
+                        option.textContent = medico.nombre;
+                        if (/*[[${cita?.medico?.id}]]*/ 0 == medico.id) {
+                            option.selected = true;
+                        }
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error loading medicos:', error));
+        }
+
+        function showAlert(type, message) {
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+
+            // Remove existing alerts
+            document.querySelectorAll('.alert').forEach(alert => alert.remove());
+
+            // Add new alert at the top of the form
+            const form = document.getElementById('citaForm');
+            form.insertAdjacentHTML('afterbegin', alertHtml);
+
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                const alert = document.querySelector('.alert');
+                if (alert) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

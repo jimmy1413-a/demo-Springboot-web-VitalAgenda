@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${horario?.id} ? 'Editar Horario' : 'Nuevo Horario'">
+        Horario Form
+    </title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <div th:replace="fragments/medico-nav.html"></div>
+
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/medico/dashboard">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="/horarios">Horarios</a></li>
+                <li class="breadcrumb-item active" aria-current="page"
+                    th:text="${horario?.id} ? 'Editar' : 'Nuevo Horario'">Formulario</li>
+            </ol>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-0">
+                    <i th:class="${horario?.id} ? 'fas fa-edit text-warning' : 'fas fa-plus text-success'"></i>
+                    <span th:text="${horario?.id} ? 'Editar Horario' : 'Nuevo Horario'">Formulario de Horario</span>
+                </h1>
+                <p class="text-muted mb-0"
+                   th:text="${horario?.id} ? 'Modificar horario de atención' : 'Configurar nuevo horario de atención'">
+                   Formulario de horario
+                </p>
+            </div>
+            <div>
+                <a href="/horarios" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver a Horarios
+                </a>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Main Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-clock"></i> Configuración de Horario
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="horarioForm" th:action="${horario?.id} ? '/horarios/api/' + ${horario.id} : '/horarios/api'"
+                              method="post">
+
+                            <!-- Horario Information -->
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="diaSemana" class="form-label">
+                                        <i class="fas fa-calendar-week"></i> Día de la Semana *
+                                    </label>
+                                    <select class="form-control" id="diaSemana" name="diaSemana" required>
+                                        <option value="MONDAY" th:selected="${horario?.diaSemana?.name()} == 'MONDAY'">Lunes</option>
+                                        <option value="TUESDAY" th:selected="${horario?.diaSemana?.name()} == 'TUESDAY'">Martes</option>
+                                        <option value="WEDNESDAY" th:selected="${horario?.diaSemana?.name()} == 'WEDNESDAY'">Miércoles</option>
+                                        <option value="THURSDAY" th:selected="${horario?.diaSemana?.name()} == 'THURSDAY'">Jueves</option>
+                                        <option value="FRIDAY" th:selected="${horario?.diaSemana?.name()} == 'FRIDAY'">Viernes</option>
+                                        <option value="SATURDAY" th:selected="${horario?.diaSemana?.name()} == 'SATURDAY'">Sábado</option>
+                                        <option value="SUNDAY" th:selected="${horario?.diaSemana?.name()} == 'SUNDAY'">Domingo</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="horaInicio" class="form-label">
+                                        <i class="fas fa-clock"></i> Hora Inicio *
+                                    </label>
+                                    <input type="time"
+                                           class="form-control"
+                                           id="horaInicio"
+                                           name="horaInicio"
+                                           th:value="${horario?.horaInicio}"
+                                           required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="horaFin" class="form-label">
+                                        <i class="fas fa-clock"></i> Hora Fin *
+                                    </label>
+                                    <input type="time"
+                                           class="form-control"
+                                           id="horaFin"
+                                           name="horaFin"
+                                           th:value="${horario?.horaFin}"
+                                           required>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    <strong>Nota:</strong> Este horario estará disponible para que los pacientes puedan agendar citas.
+                                    Asegúrate de que las horas sean coherentes y no se solapen con otros horarios del mismo día.
+                                </div>
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="d-flex gap-2 justify-content-center">
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i th:class="${horario?.id} ? 'fas fa-save' : 'fas fa-plus'"></i>
+                                    <span th:text="${horario?.id} ? 'Actualizar Horario' : 'Crear Horario'">Enviar</span>
+                                </button>
+                                <button type="reset" class="btn btn-outline-secondary">
+                                    <i class="fas fa-undo"></i> Restablecer
+                                </button>
+                                <a href="/horarios" class="btn btn-outline-danger">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Help Information -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-info-circle"></i> Información sobre Horarios
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-lightbulb text-warning"></i> Consejos:</h6>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <i class="fas fa-check text-success"></i>
+                                        Configura horarios realistas de atención
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-check text-success"></i>
+                                        Evita solapamientos en el mismo día
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-check text-success"></i>
+                                        Incluye tiempo de descanso entre citas
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-calendar-check text-primary"></i> Funcionamiento:</h6>
+                                <div class="bg-light p-3 rounded">
+                                    <p class="mb-1">Los pacientes podrán agendar citas solo en:</p>
+                                    <ul class="mb-0">
+                                        <li>Los días que configures</li>
+                                        <li>Dentro de tus horarios disponibles</li>
+                                        <li>Con duración estándar por cita</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-light text-center text-muted py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">
+                <i class="fas fa-hospital"></i> Sistema Médico - Gestión de Horarios
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Form validation
+            document.getElementById('horarioForm').addEventListener('submit', function(e) {
+                const horaInicio = document.getElementById('horaInicio').value;
+                const horaFin = document.getElementById('horaFin').value;
+
+                if (horaInicio >= horaFin) {
+                    e.preventDefault();
+                    alert('La hora de fin debe ser posterior a la hora de inicio.');
+                    return;
+                }
+
+                // Submit form
+                const formData = new FormData(this);
+                const horarioData = {
+                    diaSemana: formData.get('diaSemana'),
+                    horaInicio: formData.get('horaInicio'),
+                    horaFin: formData.get('horaFin'),
+                    medico: { id: /*[[${medico.id}]]*/ 1 } // Current doctor ID
+                };
+
+                const isEdit = /*[[${horario?.id}]]*/ false;
+                const url = isEdit ? `/horarios/api/[[${horario?.id}]]` : '/horarios/api';
+                const method = isEdit ? 'PUT' : 'POST';
+
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(horarioData)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Network response was not ok');
+                })
+                .then(data => {
+                    showAlert('success', `Horario ${isEdit ? 'actualizado' : 'creado'} exitosamente!`);
+                    setTimeout(() => {
+                        globalThis.location.href = '/horarios';
+                    }, 1500);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('danger', `Error ${isEdit ? 'actualizando' : 'creando'} el horario. Por favor, inténtelo de nuevo.`);
+                });
+
+                e.preventDefault();
+            });
+        });
+
+        function showAlert(type, message) {
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+
+            // Remove existing alerts
+            document.querySelectorAll('.alert').forEach(alert => alert.remove());
+
+            // Add new alert at the top of the form
+            const form = document.getElementById('horarioForm');
+            form.insertAdjacentHTML('afterbegin', alertHtml);
+
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                const alert = document.querySelector('.alert');
+                if (alert) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
